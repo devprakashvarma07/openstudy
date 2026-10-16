@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap');
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* PW design system tokens */
+    --font-sans: 'Reddit Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    color-scheme: light;
+
+    /* Light theme (default = system) */
+    --c-page: #eaecef;
+    --c-card: #ffffff;
+    --c-surface: #f3f4f6;
+    --c-tint: #f1efff;
+    --c-tint-strong: #d2ccff;
+    --c-border: #efefef;
+    --c-border-strong: #d9dce1;
+    --c-heading: #1b2124;
+    --c-body: #3d3d3d;
+    --c-muted: #757575;
+    --c-disabled: #a1a3a4;
+    --c-primary: #5a4bda;
+    --c-primary-hover: #4437b8;
+    --c-accent: #5a4bda;
+    --c-header: rgba(255, 255, 255, 0.95);
+    --c-success: #1b7938;
+    --c-success-soft: #dff1e4;
+  }
+
+  [data-theme='dark'] {
+    color-scheme: dark;
+    --c-page: #09090b;
+    --c-card: #1e1e24;
+    --c-surface: #141419;
+    --c-tint: #23233a;
+    --c-tint-strong: #332e56;
+    --c-border: #2a2a33;
+    --c-border-strong: #3a3a46;
+    --c-heading: #f0f0f1;
+    --c-body: #c6c6cc;
+    --c-muted: #9a9aa5;
+    --c-disabled: #6f6f7a;
+    --c-primary: #5a4bda;
+    --c-primary-hover: #6f60e8;
+    --c-accent: #9387ff;
+    --c-header: rgba(20, 20, 25, 0.95);
+    --c-success: #4ade80;
+    --c-success-soft: rgba(74, 222, 128, 0.12);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--c-page);
+    color: var(--c-body);
+    margin: 0;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+}
+
+/* PW-style sleek scrollbar (follows theme) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--c-page);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--c-border-strong);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c-muted);
+}

@@ -1,0 +1,6 @@
+{
+  "name": "PiMaxer Learning Portal",
+  "description": "High-performance student learning portal and cinema video streaming powered by PiMaxer Cloud CDN Gateway.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
