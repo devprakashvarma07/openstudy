@@ -223,6 +223,19 @@ function getFallbackBatches(): BatchesResponse {
     limit: 5,
     data: [
       {
+        _id: '6098dae69ca64b0018b1d4a9',
+        name: 'NEET Umeed',
+        type: 'E_BATCH',
+        byName: '',
+        startDate: '2021-05-09T18:30:00.000Z',
+        endDate: '2030-06-30T18:29:59.000Z',
+        fee: { amount: 0, total: 0, currency: 'INR', name: 'Free' },
+        previewImage: {
+          baseUrl: 'https://static.pw.live/',
+          key: '5eb393ee95fab7468a79d189/07a6f9f9-e081-4ac0-a4d7-34acdb8e8a7f.png',
+        },
+      },
+      {
         _id: '6a86ce9141c8c3630248cf70',
         name: 'JEE 360 (Class 12th & Droppers)',
         class: '12+',
@@ -276,20 +289,6 @@ function getFallbackBatches(): BatchesResponse {
         previewImage: {
           baseUrl: 'https://static.pw.live/',
           key: '5eb393ee95fab7468a79d189/ADMIN/215836ef-2bc2-4517-b229-2530ed828f2f.png',
-        },
-      },
-      {
-        _id: '68dfb42e2a945cdea79b67d6',
-        name: 'Sarv Pratham UPPSC 2026 - हिंदी',
-        class: 'Graduation',
-        completed_lectures_count: 812,
-        total_lectures: 812,
-        language: 'Hinglish',
-        slug: 'sarv-pratham-uppsc-2026-हिंदी-193974',
-        status: 'COMPLETED',
-        previewImage: {
-          baseUrl: 'https://static.pw.live/',
-          key: '5eb393ee95fab7468a79d189/ADMIN/33c27807-122f-425d-816d-edd0f1d714c6.png',
         },
       },
     ],

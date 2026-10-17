@@ -114,7 +114,7 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
     return batches.filter((b) => {
       const matchesSearch =
         b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        b.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (b.slug && b.slug.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (b.language && b.language.toLowerCase().includes(searchQuery.toLowerCase()));
       const matchesClass = selectedClass === 'all' || b.class === selectedClass;
       return matchesSearch && matchesClass;
@@ -293,9 +293,9 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
 
                   {/* Clean unboxed metadata with separators */}
                   <div className="flex items-center gap-2 text-xs text-[var(--c-muted)] font-mono mb-2">
-                    <span>Class {batch.class || 'N/A'}</span>
+                    <span>{batch.class ? `Class ${batch.class}` : (batch.type || 'Batch')}</span>
                     <span aria-hidden="true" className="text-[var(--c-muted)]">·</span>
-                    <span>{batch.language || 'Hinglish'}</span>
+                    <span>{batch.language || batch.byName || 'Hinglish'}</span>
                     <span aria-hidden="true" className="text-[var(--c-muted)]">·</span>
                     <span className="tabular-nums">{totalLectures} Lectures</span>
                   </div>

@@ -13,17 +13,27 @@ export interface PreviewImage {
 
 export interface BatchItem {
   _id: string;
-  class: string;
+  class?: string;
   completed_lectures_count?: number;
   total_lectures?: number;
   name: string;
-  slug: string;
-  status: string;
+  slug?: string;
+  status?: string;
   byName?: string;
   language?: string;
   previewImage?: PreviewImage;
   streamtape_download_url?: string;
   price?: Record<string, unknown>;
+  // PW API specific fields
+  type?: string;
+  description?: string;
+  startDate?: string;
+  endDate?: string;
+  fee?: { amount?: number; total?: number; currency?: string; name?: string; discount?: number };
+  isPurchased?: boolean;
+  subjects?: Array<{ _id: string; name: string; subjectId?: string }>;
+  previewVideoUrl?: string;
+  [key: string]: unknown;
 }
 
 export interface BatchesResponse {
