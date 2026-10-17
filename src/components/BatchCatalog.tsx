@@ -254,9 +254,11 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredBatches.map((batch) => {
             const imageUrl = buildImageUrl(batch.previewImage);
-            const totalLectures = batch.total_lectures || batch.completed_lectures_count || 0;
+            const totalLectures = batch.total_lectures || batch.completed_lectures_count || (batch.subjects?.length ? batch.subjects.length * 10 : 0);
             const completedCount = batch.completed_lectures_count || 0;
             const progressPercent = totalLectures > 0 ? Math.round((completedCount / totalLectures) * 100) : 100;
+            // Clean HTML from byName/description
+            const cleanText = (batch.byName || batch.description || batch.name || 'Batch').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 50);
 
             return (
               <div
@@ -295,9 +297,9 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
                   <div className="flex items-center gap-2 text-xs text-[var(--c-muted)] font-mono mb-2">
                     <span>{batch.class ? `Class ${batch.class}` : (batch.type || 'Batch')}</span>
                     <span aria-hidden="true" className="text-[var(--c-muted)]">·</span>
-                    <span>{batch.language || batch.byName || 'Hinglish'}</span>
+                    <span>{batch.language || cleanText || 'Hinglish'}</span>
                     <span aria-hidden="true" className="text-[var(--c-muted)]">·</span>
-                    <span className="tabular-nums">{totalLectures} Lectures</span>
+                    <span className="tabular-nums">{batch.subjects?.length ? `${batch.subjects.length} Subjects` : `${totalLectures} Lectures`}</span>
                   </div>
 
                   {/* Batch Title */}
