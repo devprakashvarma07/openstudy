@@ -1,0 +1,36 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+const PW_API_BASE = 'https://api.penpencil.co';
+const PW_TOKEN = process.env.PW_TOKEN || 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3OTIyMzgzOTMsImV4cCI6MTc5Mjg0MzE5My42ODMsImRhdGEiOnsiX2lkIjoiNjY3YzJlNWQyODM4ZjgzNmVmZjhkODIyIiwidXNlcm5hbWUiOiI4NDM0OTY1MTk0IiwiZmlyc3ROYW1lIjoiRGV2IiwibGFzdE5hbWUiOiJWZXJtYSIsIm9yZ2FuaXphdGlvbiI6eyJfaWQiOiI1ZWIzOTNlZTk1ZmFiNzQ2OGE3OWQxODkiLCJ3ZWJzaXRlIjoicGh5c2ljc3dhbGxhaC5jb20iLCJuYW1lIjoiUGh5c2ljc3dhbGxhaCJ9LCJlbWFpbCI6ImRldnByYWthc2h2YXJtYTIwMDdAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwib25lUm9sZXMiOltdLCJ0eXBlIjoiVVNFUiJ9LCJqdGkiOiJ3ZE1zWjlsRVM5dWx2RjJsUThWMnZnXzY2N2MyZTVkMjgzOGY4MzZlZmY4ZDgyMiJ9.hl4tQ0M6mk8RO4RXg0gkdq2S_UcanyGTkLyHlNEVjfY';
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const { uuid } = req.query;
+  const range = req.headers.range;
+  const headers: Record<string, string> = { Authorization: `Bearer ${PW_TOKEN}` };
+  if (range) headers.Range = range;
+
+  try {
+    const upstream = await fetch(`${PW_API_BASE}/stream/${uuid}/video.mp4`, { headers });
+    res.status(upstream.status);
+    const ct = upstream.headers.get('content-type');
+    const cl = upstream.headers.get('content-length');
+    const cr = upstream.headers.get('content-range');
+    const ar = upstream.headers.get('accept-ranges');
+    if (ct) res.setHeader('Content-Type', ct);
+    if (cl) res.setHeader('Content-Length', cl);
+    if (cr) res.setHeader('Content-Range', cr);
+    if (ar) res.setHeader('Accept-Ranges', ar);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    if (upstream.body) {
+      const reader = upstream.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(Buffer.from(value));
+      }
+    }
+    res.end();
+  } catch (err) {
+    res.status(500).json({ success: false, message: String(err) });
+  }
+}
