@@ -9,7 +9,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const limit = (req.query.limit as string) || '50';
   try {
     const pwRes = await fetch(`${PW_API_BASE}/v1/batches/list?page=${page}&limit=${limit}`, {
-      headers: { Authorization: `Bearer ${PW_TOKEN}`, Accept: 'application/json', 'Organization-Id': '5eb393ee95fab7468a79d189' },
+      headers: { Authorization: `Bearer ${PW_TOKEN}`, Accept: 'application/json', 'organizationid': '5eb393ee95fab7468a79d189' },
     });
     const data = await pwRes.json();
     res.status(pwRes.status).json(data);

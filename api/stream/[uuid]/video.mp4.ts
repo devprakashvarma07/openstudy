@@ -6,7 +6,7 @@ const PW_TOKEN = process.env.PW_TOKEN || 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { uuid } = req.query;
   const range = req.headers.range;
-  const headers: Record<string, string> = { Authorization: `Bearer ${PW_TOKEN}`, 'Organization-Id': '5eb393ee95fab7468a79d189' };
+  const headers: Record<string, string> = { Authorization: `Bearer ${PW_TOKEN}`, 'organizationid': '5eb393ee95fab7468a79d189' };
   if (range) headers.Range = range;
 
   try {
