@@ -9,7 +9,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const page = (req.query.page as string) || '1';
   const contentType = (req.query.contentType as string) || 'videos';
   try {
-    const pwRes = await fetch(`${PW_API_BASE}/v2/batches/${batchId}/subject/${subjectId}/contents?page=${page}&contentType=${contentType}`, {
+    const pwRes = await fetch(`${PW_API_BASE}/v1/batches/${batchId}/subject/${subjectId}/contents?page=${page}&contentType=${contentType}`, {
       headers: { Authorization: `Bearer ${PW_TOKEN}`, Accept: 'application/json', 'organizationid': '5eb393ee95fab7468a79d189' },
     });
     const data = await pwRes.json();
