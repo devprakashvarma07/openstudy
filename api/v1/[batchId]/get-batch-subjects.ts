@@ -8,7 +8,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { batchId } = req.query;
   try {
     const pwRes = await fetch(`${PW_API_BASE}/v1/batches/${batchId}/subjects`, {
-      headers: { Authorization: `Bearer ${PW_TOKEN}`, Accept: 'application/json' },
+      headers: { Authorization: `Bearer ${PW_TOKEN}`, Accept: 'application/json', 'Organization-Id': '5eb393ee95fab7468a79d189' },
     });
     const data = await pwRes.json();
     res.status(pwRes.status).json(data);
