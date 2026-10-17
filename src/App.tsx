@@ -303,6 +303,7 @@ export default function App() {
           }}
           hasActiveBatch={!!activeBatch}
           hasEnrolled={enrolledBatches.length > 0}
+          isPlayerOpen={isPlayerOpen}
           notesTab={notesTab}
           onOpenNotesTab={handleOpenNotesTab}
           theme={theme}

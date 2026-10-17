@@ -16,6 +16,7 @@ interface NavbarProps {
   onNavigate: (view: 'batches' | 'batch-detail' | 'enrolled' | 'notes' | 'schedule') => void;
   hasActiveBatch: boolean;
   hasEnrolled: boolean;
+  isPlayerOpen: boolean;
   notesTab: 'notes' | 'bookmarks';
   onOpenNotesTab: (tab: 'notes' | 'bookmarks') => void;
   theme: 'light' | 'dark';
@@ -27,6 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNavigate,
   hasActiveBatch,
   hasEnrolled,
+  isPlayerOpen,
   notesTab,
   onOpenNotesTab,
   theme,
@@ -116,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       key: 'study',
       label: 'Study Notes',
       icon: BookOpen,
-      active: activeView === 'notes' && notesTab === 'notes',
+      active: activeView === 'notes' && (isPlayerOpen || notesTab === 'notes'),
       dim: false,
       disabled: false,
       onClick: () => openNotesTab('notes'),
@@ -125,7 +127,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       key: 'bookmarks',
       label: 'Bookmarks',
       icon: Bookmark,
-      active: activeView === 'notes' && notesTab === 'bookmarks',
+      active: activeView === 'notes' && !isPlayerOpen && notesTab === 'bookmarks',
       dim: false,
       disabled: false,
       onClick: () => openNotesTab('bookmarks'),
@@ -151,7 +153,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       key: 'study',
       label: 'Study',
       icon: BookOpen,
-      active: activeView === 'notes' && notesTab === 'notes',
+      active: activeView === 'notes' && (isPlayerOpen || notesTab === 'notes'),
       dim: false,
       onClick: () => openNotesTab('notes'),
     },
@@ -175,7 +177,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       key: 'bookmarks',
       label: 'Bookmarked',
       icon: Bookmark,
-      active: activeView === 'notes' && notesTab === 'bookmarks',
+      active: activeView === 'notes' && !isPlayerOpen && notesTab === 'bookmarks',
       dim: false,
       onClick: () => openNotesTab('bookmarks'),
     },

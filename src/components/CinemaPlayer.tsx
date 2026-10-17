@@ -423,15 +423,15 @@ export const CinemaPlayer: React.FC<CinemaPlayerProps> = ({
                       step={0.05}
                       value={isMuted ? 0 : volume}
                       onChange={handleVolumeChange}
-                      className="w-16 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                      className="hidden sm:block w-16 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400"
                     />
                   </div>
                 </div>
 
                 {/* Right controls: Speed, Theater, PiP, Fullscreen */}
-                <div className="flex items-center gap-2 text-xs font-mono">
+                <div className="flex items-center gap-2 text-xs font-mono shrink-0">
                   {/* Playback speed selector */}
-                  <div className="flex items-center bg-black/60 rounded-md border border-[#1e293b] p-0.5">
+                  <div className="hidden sm:flex items-center bg-black/60 rounded-md border border-[#1e293b] p-0.5">
                     {[1, 1.25, 1.5, 2].map((spd) => (
                       <button
                         key={spd}
