@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const PW_API_BASE = 'https://api.penpencil.co';
-const PW_TOKEN = process.env.PW_TOKEN || '';
+const PW_TOKEN = process.env.PW_TOKEN || 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3OTIyMzgzOTMsImV4cCI6MTc5Mjg0MzE5My42ODMsImRhdGEiOnsiX2lkIjoiNjY3YzJlNWQyODM4ZjgzNmVmZjhkODIyIiwidXNlcm5hbWUiOiI4NDM0OTY1MTk0IiwiZmlyc3ROYW1lIjoiRGV2IiwibGFzdE5hbWUiOiJWZXJtYSIsIm9yZ2FuaXphdGlvbiI6eyJfaWQiOiI1ZWIzOTNlZTk1ZmFiNzQ2OGE3OWQxODkiLCJ3ZWJzaXRlIjoicGh5c2ljc3dhbGxhaC5jb20iLCJuYW1lIjoiUGh5c2ljc3dhbGxhaCJ9LCJlbWFpbCI6ImRldnByYWthc2h2YXJtYTIwMDdAZ21haWwuY29tIiwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwib25lUm9sZXMiOltdLCJ0eXBlIjoiVVNFUiJ9LCJqdGkiOiJ3ZE1zWjlsRVM5dWx2RjJsUThWMnZnXzY2N2MyZTVkMjgzOGY4MzZlZmY4ZDgyMiJ9.hl4tQ0M6mk8RO4RXg0gkdq2S_UcanyGTkLyHlNEVjfY';
 
 // CORS headers for all responses
 function setCorsHeaders(res: VercelResponse) {
@@ -119,52 +119,59 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
-  const path = (req.query.path as string[]) || [];
-  const fullPath = '/' + path.join('/');
+  // Extract path from URL (handles both /api/health and /api/v1/batches)
+  const urlPath = req.url || '';
+  // Remove /api prefix if present
+  const fullPath = urlPath.replace(/^\/api/, '') || '/';
+  // Also handle Vercel's query-based path routing
+  const queryPath = (req.query.path as string[]) || [];
+  const altPath = '/' + queryPath.join('/');
+  // Use whichever gives a more specific path
+  const finalPath = (altPath !== '/' && !urlPath.includes(altPath)) ? altPath : fullPath;
 
   try {
     // Health check
-    if (fullPath === '/health') {
+    if (finalPath === '/health') {
       return handleHealth(res);
     }
 
     // Batches listing
-    if (fullPath === '/v1/batches') {
+    if (finalPath.startsWith('/v1/batches')) {
       return await handleBatches(req, res);
     }
 
     // Stream proxy: /stream/{uuid}/video.mp4
-    const streamMatch = fullPath.match(/^\/stream\/([^/]+)\/video\.mp4$/);
+    const streamMatch = finalPath.match(/^\/stream\/([^/]+)\/video\.mp4$/);
     if (streamMatch) {
       return await handleStream(req, res, streamMatch[1]);
     }
 
     // Video details: /v1/videos/{videoId}
-    const videoMatch = fullPath.match(/^\/v1\/videos\/([^/]+)$/);
+    const videoMatch = finalPath.match(/^\/v1\/videos\/([^/]+)$/);
     if (videoMatch) {
       return await handleVideoDetails(req, res, videoMatch[1]);
     }
 
     // Batch subjects: /v1/{batchId}/get-batch-subjects
-    const subjectsMatch = fullPath.match(/^\/v1\/([^/]+)\/get-batch-subjects$/);
+    const subjectsMatch = finalPath.match(/^\/v1\/([^/]+)\/get-batch-subjects$/);
     if (subjectsMatch) {
       return await handleBatchSubjects(req, res, subjectsMatch[1]);
     }
 
     // Batch schedule: /v1/{batchId}/schedule
-    const scheduleMatch = fullPath.match(/^\/v1\/([^/]+)\/schedule$/);
+    const scheduleMatch = finalPath.match(/^\/v1\/([^/]+)\/schedule$/);
     if (scheduleMatch) {
       return await handleBatchSchedule(req, res, scheduleMatch[1]);
     }
 
     // Subject topics: /v1/{batchId}/subject/{subjectId}/topics
-    const topicsMatch = fullPath.match(/^\/v1\/([^/]+)\/subject\/([^/]+)\/topics$/);
+    const topicsMatch = finalPath.match(/^\/v1\/([^/]+)\/subject\/([^/]+)\/topics$/);
     if (topicsMatch) {
       return await handleSubjectTopics(req, res, topicsMatch[1], topicsMatch[2]);
     }
 
     // Subject contents: /v1/{batchId}/subject/{subjectId}/contents
-    const contentsMatch = fullPath.match(/^\/v1\/([^/]+)\/subject\/([^/]+)\/contents$/);
+    const contentsMatch = finalPath.match(/^\/v1\/([^/]+)\/subject\/([^/]+)\/contents$/);
     if (contentsMatch) {
       return await handleSubjectContents(req, res, contentsMatch[1], contentsMatch[2]);
     }
