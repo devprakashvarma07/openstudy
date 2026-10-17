@@ -179,11 +179,28 @@ export const CinemaPlayer: React.FC<CinemaPlayerProps> = ({
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().catch(console.error);
+      containerRef.current
+        .requestFullscreen()
+        .then(() => {
+          // APK / Android WebView: rotate to landscape automatically while fullscreen
+          try {
+            screen.orientation.lock('landscape').catch(() => {
+              /* orientation lock not supported in this context */
+            });
+          } catch {
+            /* screen.orientation unavailable */
+          }
+        })
+        .catch(console.error);
       setIsFullscreen(true);
     } else {
       document.exitFullscreen().catch(console.error);
       setIsFullscreen(false);
+      try {
+        screen.orientation.unlock();
+      } catch {
+        /* orientation lock not supported */
+      }
     }
   };
 
@@ -199,6 +216,32 @@ export const CinemaPlayer: React.FC<CinemaPlayerProps> = ({
       console.warn('PiP not supported or failed:', err);
     }
   };
+
+  // Stay in sync with real fullscreen state (Android back button / ESC can exit
+  // fullscreen without going through toggleFullscreen) and release the
+  // orientation lock so the device can return to portrait automatically.
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      const active = !!document.fullscreenElement;
+      setIsFullscreen(active);
+      if (!active) {
+        try {
+          screen.orientation.unlock();
+        } catch {
+          /* orientation lock not supported */
+        }
+      }
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', onFullscreenChange);
+      try {
+        screen.orientation.unlock();
+      } catch {
+        /* orientation lock not supported */
+      }
+    };
+  }, []);
 
   // Keyboard shortcuts
   useEffect(() => {
