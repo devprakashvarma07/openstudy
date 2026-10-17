@@ -137,6 +137,16 @@ export const BatchDetail: React.FC<BatchDetailProps> = ({
     };
   }, [batch._id, selectedSubjectId]);
 
+  // Early return if batch data is incomplete
+  if (!batch || !batch._id || !batch.name) {
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-lg font-semibold">Batch data unavailable</h2>
+        <button onClick={onBack} className="mt-4 px-4 py-2 text-sm rounded-lg bg-[var(--c-primary)] text-white">Go Back</button>
+      </div>
+    );
+  }
+
   const activeSubject = subjects.find((s) => s.subjectId === selectedSubjectId);
   const activeSubjectName = activeSubject?.subjectName || 'Curriculum Subject';
 
