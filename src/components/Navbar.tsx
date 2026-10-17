@@ -13,9 +13,10 @@ import {
 } from 'lucide-react';
 
 interface NavbarProps {
-  activeView: 'batches' | 'batch-detail' | 'cinema' | 'notes' | 'schedule';
-  onNavigate: (view: 'batches' | 'batch-detail' | 'cinema' | 'notes' | 'schedule') => void;
+  activeView: 'batches' | 'batch-detail' | 'enrolled' | 'cinema' | 'notes' | 'schedule';
+  onNavigate: (view: 'batches' | 'batch-detail' | 'enrolled' | 'cinema' | 'notes' | 'schedule') => void;
   hasActiveBatch: boolean;
+  hasEnrolled: boolean;
   hasActiveVideo: boolean;
   notesTab: 'notes' | 'bookmarks';
   onOpenNotesTab: (tab: 'notes' | 'bookmarks') => void;
@@ -27,6 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeView,
   onNavigate,
   hasActiveBatch,
+  hasEnrolled,
   hasActiveVideo,
   notesTab,
   onOpenNotesTab,
@@ -37,15 +39,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const panelTouchX = useRef(0);
 
-  const navigate = (view: 'batches' | 'batch-detail' | 'cinema' | 'notes' | 'schedule') => {
+  const navigate = (view: 'batches' | 'batch-detail' | 'enrolled' | 'cinema' | 'notes' | 'schedule') => {
     setIsDrawerOpen(false);
     onNavigate(view);
   };
 
   const goEnrolled = () => {
     setIsDrawerOpen(false);
-    // Fall back to the catalogue when no batch is open yet
-    onNavigate(hasActiveBatch ? 'batch-detail' : 'batches');
+    onNavigate('enrolled');
   };
 
   const openNotesTab = (tab: 'notes' | 'bookmarks') => {
@@ -108,8 +109,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       key: 'enrolled',
       label: 'Enrolled Curriculum',
       icon: GraduationCap,
-      active: activeView === 'batch-detail',
-      dim: !hasActiveBatch,
+      active: activeView === 'enrolled' || activeView === 'batch-detail',
+      dim: !hasEnrolled,
       disabled: false,
       onClick: goEnrolled,
     },
@@ -177,8 +178,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       key: 'enrolled',
       label: 'Enrolled',
       icon: GraduationCap,
-      active: activeView === 'batch-detail',
-      dim: !hasActiveBatch,
+      active: activeView === 'enrolled' || activeView === 'batch-detail',
+      dim: !hasEnrolled,
       onClick: goEnrolled,
     },
     {

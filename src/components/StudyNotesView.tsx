@@ -6,14 +6,12 @@ interface StudyNotesViewProps {
   onPlayBookmark: (item: BookmarkItem) => void;
   onRemoveBookmark: (lectureId: string) => void;
   activeTab: 'notes' | 'bookmarks';
-  onTabChange: (tab: 'notes' | 'bookmarks') => void;
 }
 
 export const StudyNotesView: React.FC<StudyNotesViewProps> = ({
   onPlayBookmark,
   onRemoveBookmark,
   activeTab,
-  onTabChange,
 }) => {
   const [notes, setNotes] = useState<LectureNote[]>([]);
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
@@ -94,55 +92,28 @@ export const StudyNotesView: React.FC<StudyNotesViewProps> = ({
 
   return (
     <div className="space-y-6 pb-20">
-      {/* Tabs and Search Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        {/* Segmented control */}
-        <div className="flex items-center gap-1.5 p-1 bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)]">
+      {/* Export + Search */}
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        {notes.length > 0 && (
           <button
-            onClick={() => onTabChange('notes')}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-              activeTab === 'notes'
-                ? 'bg-[var(--c-primary)] text-[#ffffff] shadow-sm'
-                : 'text-[var(--c-muted)] hover:text-[var(--c-body)]'
-            }`}
+            onClick={handleExportAllNotes}
+            className="px-3.5 py-2 rounded-xl bg-[var(--c-tint)] hover:bg-[var(--c-tint-strong)] text-[var(--c-accent)] border border-[var(--c-tint-strong)] text-xs font-semibold flex items-center gap-2 cursor-pointer transition-colors whitespace-nowrap"
           >
-            Lecture Notes ({notes.length})
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Export All Notes (.md)</span>
+            <span className="sm:hidden">Export</span>
           </button>
-          <button
-            onClick={() => onTabChange('bookmarks')}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-              activeTab === 'bookmarks'
-                ? 'bg-[var(--c-primary)] text-[#ffffff] shadow-sm'
-                : 'text-[var(--c-muted)] hover:text-[var(--c-body)]'
-            }`}
-          >
-            Bookmarked Lectures ({bookmarks.length})
-          </button>
-        </div>
+        )}
 
-        {/* Right: export (when notes exist) + search */}
-        <div className="flex items-center gap-3">
-          {notes.length > 0 && (
-            <button
-              onClick={handleExportAllNotes}
-              className="px-3.5 py-2 rounded-xl bg-[var(--c-tint)] hover:bg-[var(--c-tint-strong)] text-[var(--c-accent)] border border-[var(--c-tint-strong)] text-xs font-semibold flex items-center gap-2 cursor-pointer transition-colors whitespace-nowrap"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Export All Notes (.md)</span>
-              <span className="sm:hidden">Export</span>
-            </button>
-          )}
-
-          <div className="relative max-w-xs w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--c-muted)]" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search notes or bookmarks..."
-              className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-[var(--c-surface)] border border-[var(--c-border)] text-xs text-[var(--c-body)] placeholder-[var(--c-disabled)] focus:outline-none focus:border-[var(--c-primary)]"
-            />
-          </div>
+        <div className="relative max-w-xs w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--c-muted)]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search notes or bookmarks..."
+            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-[var(--c-surface)] border border-[var(--c-border)] text-xs text-[var(--c-body)] placeholder-[var(--c-disabled)] focus:outline-none focus:border-[var(--c-primary)]"
+          />
         </div>
       </div>
 

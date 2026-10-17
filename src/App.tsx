@@ -4,6 +4,7 @@ import { BatchCatalog } from './components/BatchCatalog';
 import { BatchDetail } from './components/BatchDetail';
 import { CinemaPlayer } from './components/CinemaPlayer';
 import { StudyNotesView } from './components/StudyNotesView';
+import { EnrolledView } from './components/EnrolledView';
 import { ScheduleView } from './components/ScheduleView';
 import { HealthModal } from './components/HealthModal';
 import {
@@ -21,7 +22,7 @@ import {
 } from './services/pimaxerApi';
 
 export default function App() {
-  const [activeView, setActiveView] = useState<'batches' | 'batch-detail' | 'cinema' | 'notes' | 'schedule'>('notes');
+  const [activeView, setActiveView] = useState<'batches' | 'batch-detail' | 'enrolled' | 'cinema' | 'notes' | 'schedule'>('notes');
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [isHealthModalOpen, setIsHealthModalOpen] = useState(false);
 
@@ -103,6 +104,19 @@ export default function App() {
     }
   });
 
+  // Enrolled batches (saved locally; shown in the Enrolled section)
+  const [enrolledBatches, setEnrolledBatches] = useState<BatchItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('os_enrolled_batches');
+      return saved ? (JSON.parse(saved) as BatchItem[]) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Where the open batch curriculum was reached from (catalogue or enrolled list)
+  const [batchDetailOrigin, setBatchDetailOrigin] = useState<'batches' | 'enrolled'>('batches');
+
   // Initial gateway health probe
   useEffect(() => {
     let isMounted = true;
@@ -147,8 +161,38 @@ export default function App() {
   // Handle select batch
   const handleSelectBatch = (batch: BatchItem) => {
     setActiveBatch(batch);
+    setBatchDetailOrigin('batches');
     setActiveView('batch-detail');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Enroll: save the batch locally and jump to the Enrolled section
+  const handleEnrollBatch = (batch: BatchItem) => {
+    setEnrolledBatches((prev) => {
+      if (prev.some((b) => b._id === batch._id)) return prev;
+      const next = [...prev, batch];
+      localStorage.setItem('os_enrolled_batches', JSON.stringify(next));
+      return next;
+    });
+    setActiveView('enrolled');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Open a batch from the Enrolled section
+  const handleOpenEnrolledBatch = (batch: BatchItem) => {
+    setActiveBatch(batch);
+    setBatchDetailOrigin('enrolled');
+    setActiveView('batch-detail');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Remove a batch from the Enrolled section
+  const handleRemoveEnrolledBatch = (batchId: string) => {
+    setEnrolledBatches((prev) => {
+      const next = prev.filter((b) => b._id !== batchId);
+      localStorage.setItem('os_enrolled_batches', JSON.stringify(next));
+      return next;
+    });
   };
 
   // Handle play lecture from curriculum
@@ -252,6 +296,7 @@ export default function App() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           hasActiveBatch={!!activeBatch}
+          hasEnrolled={enrolledBatches.length > 0}
           hasActiveVideo={!!currentLecture}
           notesTab={notesTab}
           onOpenNotesTab={handleOpenNotesTab}
@@ -269,13 +314,27 @@ export default function App() {
               isLoading={isBatchesLoading}
               onPageChange={(page) => setCurrentPage(page)}
               onSelectBatch={handleSelectBatch}
+              enrolledIds={new Set(enrolledBatches.map((b) => b._id))}
+              onEnrollBatch={handleEnrollBatch}
+            />
+          )}
+
+          {activeView === 'enrolled' && (
+            <EnrolledView
+              enrolledBatches={enrolledBatches}
+              onOpenBatch={handleOpenEnrolledBatch}
+              onRemoveBatch={handleRemoveEnrolledBatch}
+              onBrowseCatalogue={() => {
+                setActiveView('batches');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             />
           )}
 
           {activeView === 'batch-detail' && activeBatch && (
             <BatchDetail
               batch={activeBatch}
-              onBack={() => setActiveView('batches')}
+              onBack={() => setActiveView(batchDetailOrigin)}
               onPlayLecture={handlePlayLecture}
               completedLectures={completedLectures}
               onToggleComplete={handleToggleComplete}
@@ -296,7 +355,7 @@ export default function App() {
               onToggleBookmark={handleToggleBookmark}
               onSelectLecture={(lec) => setCurrentLecture(lec)}
               onBackToCurriculum={() => {
-                if (activeBatch) setActiveView('batch-detail');
+                if (activeBatch) setActiveView(batchDetailOrigin);
                 else setActiveView('batches');
               }}
             />
@@ -305,7 +364,6 @@ export default function App() {
           {activeView === 'notes' && (
             <StudyNotesView
               activeTab={notesTab}
-              onTabChange={setNotesTab}
               onPlayBookmark={handlePlayBookmark}
               onRemoveBookmark={handleRemoveBookmark}
             />

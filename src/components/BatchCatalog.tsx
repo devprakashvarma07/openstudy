@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Search, Sparkles, BookOpen, ChevronRight, CheckCircle2, ArrowRight, Layers, Download, Filter, ChevronDown, Check } from 'lucide-react';
+import { Search, Sparkles, BookOpen, ChevronRight, CheckCircle2, ArrowRight, Layers, GraduationCap, Filter, ChevronDown, Check } from 'lucide-react';
 import { BatchItem } from '../types/pimaxer';
 import { buildImageUrl } from '../services/pimaxerApi';
 
@@ -10,6 +10,8 @@ interface BatchCatalogProps {
   isLoading: boolean;
   onPageChange: (newPage: number) => void;
   onSelectBatch: (batch: BatchItem) => void;
+  enrolledIds: Set<string>;
+  onEnrollBatch: (batch: BatchItem) => void;
 }
 
 export const BatchCatalog: React.FC<BatchCatalogProps> = ({
@@ -19,6 +21,8 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
   isLoading,
   onPageChange,
   onSelectBatch,
+  enrolledIds,
+  onEnrollBatch,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedClass, setSelectedClass] = useState<string>('all');
@@ -268,16 +272,23 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
 
-                  {batch.streamtape_download_url && (
-                    <a
-                      href={batch.streamtape_download_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title="Download archive package"
-                      className="p-2 text-[var(--c-muted)] hover:text-[var(--c-accent)] hover:bg-[var(--c-surface)] rounded-lg transition-colors border border-transparent hover:border-[var(--c-border-strong)]"
+                  {enrolledIds.has(batch._id) ? (
+                    <span
+                      title="Already enrolled"
+                      className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-[var(--c-tint)] text-[var(--c-accent)] border border-[var(--c-tint-strong)]"
                     >
-                      <Download className="w-4 h-4" />
-                    </a>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Enrolled</span>
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => onEnrollBatch(batch)}
+                      title="Enroll in this batch"
+                      className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-[var(--c-primary)] hover:bg-[var(--c-primary-hover)] text-[#ffffff] transition-colors cursor-pointer shadow-sm"
+                    >
+                      <GraduationCap className="w-3.5 h-3.5" />
+                      <span>Enroll</span>
+                    </button>
                   )}
                 </div>
               </div>

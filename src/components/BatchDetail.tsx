@@ -63,7 +63,7 @@ export const BatchDetail: React.FC<BatchDetailProps> = ({
 
   // Mobile drill-down flow: Subject -> Chapters -> Lectures
   const [mobileStep, setMobileStep] = useState<'subjects' | 'chapters' | 'lectures'>('subjects');
-  const [mobileTopic, setMobileTopic] = useState<string | null>(null);
+  const [mobileTopic, setMobileTopic] = useState<{ name: string; slug?: string } | null>(null);
 
   // Load batch subjects & schedule
   useEffect(() => {
@@ -143,13 +143,20 @@ export const BatchDetail: React.FC<BatchDetailProps> = ({
     c.topic.toLowerCase().includes(contentSearch.toLowerCase())
   );
 
+  // The gateway returns a single catch-all All Lectures chapter per subject,
+  // and no lecture title contains that phrase - treat it as show-everything.
+  const isCatchAllTopic = (name: string, slug?: string) =>
+    slug === 'all-lectures' || name.trim().toLowerCase() === 'all lectures';
+
+  const lecturesForTopic = (name: string, slug?: string): ContentLectureItem[] =>
+    isCatchAllTopic(name, slug)
+      ? contents
+      : contents.filter((c) => c.topic?.toLowerCase().includes(name.toLowerCase()));
+
   // Lectures for the chosen chapter in the mobile drill-down flow
-  const mobileLectures = contents.filter(
-    (c) =>
-      mobileTopic != null &&
-      c.topic?.toLowerCase().includes(mobileTopic.toLowerCase()) &&
-      c.topic.toLowerCase().includes(contentSearch.toLowerCase())
-  );
+  const mobileLectures = (
+    mobileTopic ? lecturesForTopic(mobileTopic.name, mobileTopic.slug) : []
+  ).filter((c) => c.topic.toLowerCase().includes(contentSearch.toLowerCase()));
 
   return (
     <div className="space-y-6 pb-20">
@@ -436,14 +443,12 @@ export const BatchDetail: React.FC<BatchDetailProps> = ({
                 </div>
               ) : (
                 topics.map((topic, topicIdx) => {
-                  const lectureCount = contents.filter((c) =>
-                    c.topic?.toLowerCase().includes(topic.name.toLowerCase())
-                  ).length;
+                  const lectureCount = lecturesForTopic(topic.name, topic.slug).length;
                   return (
                     <button
                       key={topic._id}
                       onClick={() => {
-                        setMobileTopic(topic.name);
+                        setMobileTopic({ name: topic.name, slug: topic.slug });
                         setContentSearch('');
                         setMobileStep('lectures');
                       }}
@@ -482,7 +487,7 @@ export const BatchDetail: React.FC<BatchDetailProps> = ({
                 <div className="text-[11px] font-mono text-[var(--c-accent)] font-semibold uppercase">
                   {activeSubjectName}
                 </div>
-                <div className="text-sm font-bold text-[var(--c-heading)] mt-0.5">{mobileTopic}</div>
+                <div className="text-sm font-bold text-[var(--c-heading)] mt-0.5">{mobileTopic?.name}</div>
               </div>
 
               <input
