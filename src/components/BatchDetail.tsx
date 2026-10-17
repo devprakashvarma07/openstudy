@@ -97,11 +97,6 @@ export const BatchDetail: React.FC<BatchDetailProps> = ({
         if (isMounted) {
           setSubjects(subjs);
           setScheduleItems(sched);
-          // Auto-select first active subject
-          const firstValid = subjs.find((s) => s.status !== 'Invisible') || subjs[0];
-          if (firstValid) {
-            setSelectedSubjectId(firstValid.subjectId);
-          }
         }
       } catch (err) {
         console.error('Failed to load batch subjects/schedule:', err);

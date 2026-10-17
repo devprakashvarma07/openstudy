@@ -164,6 +164,7 @@ export default function App() {
 
   // Handle select batch
   const handleSelectBatch = (batch: BatchItem) => {
+    if (!batch || !batch._id || !batch.name) return;
     setActiveBatch(batch);
     setBatchDetailOrigin('batches');
     setActiveView('batch-detail');
