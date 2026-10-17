@@ -8,7 +8,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const page = (req.query.page as string) || '1';
   const limit = (req.query.limit as string) || '50';
   try {
-    const pwRes = await fetch(`${PW_API_BASE}/v3/batches?page=${page}&limit=${limit}`, {
+    const pwRes = await fetch(`${PW_API_BASE}/v1/batches/list?page=${page}&limit=${limit}`, {
       headers: { Authorization: `Bearer ${PW_TOKEN}`, Accept: 'application/json' },
     });
     const data = await pwRes.json();
