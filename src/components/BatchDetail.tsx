@@ -266,7 +266,7 @@ export const BatchDetail: React.FC<BatchDetailProps> = ({
             <div className="space-y-1 max-h-[600px] overflow-y-auto pr-1">
               {subjects.map((subj) => {
                 const isSelected = subj.subjectId === selectedSubjectId;
-                const isNotice = subj.status === 'Invisible' || subj.subjectName.toLowerCase().includes('notice');
+                const isNotice = subj.status === 'Invisible' || (subj.subjectName || '').toLowerCase().includes('notice');
 
                 return (
                   <button
