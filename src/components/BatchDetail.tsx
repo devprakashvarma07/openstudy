@@ -1,4 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
+
+// Error boundary to catch render crashes
+class ErrorBoundary extends Component<{ children: React.ReactNode }, { error: string | null }> {
+  state = { error: null as string | null };
+  static getDerivedStateFromError(error: Error) {
+    return { error: error.message };
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="p-8 text-center">
+          <h2 className="text-lg font-semibold text-red-500">Something went wrong</h2>
+          <p className="text-sm text-gray-500 mt-2">{this.state.error}</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 import {
   ArrowLeft,
   BookOpen,
@@ -159,6 +178,7 @@ export const BatchDetail: React.FC<BatchDetailProps> = ({
   ).filter((c) => c.topic.toLowerCase().includes(contentSearch.toLowerCase()));
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6 pb-20">
       {/* Back button and Batch Banner */}
       <div className="flex items-center gap-3">
@@ -673,5 +693,6 @@ export const BatchDetail: React.FC<BatchDetailProps> = ({
         </div>
       )}
     </div>
+    </ErrorBoundary>
   );
 };
