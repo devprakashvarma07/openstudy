@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Search, Sparkles, BookOpen, ChevronRight, CheckCircle2, ArrowRight, Layers, GraduationCap, Filter, ChevronDown, Check } from 'lucide-react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { Search, Sparkles, BookOpen, ChevronRight, CheckCircle2, ArrowRight, Layers, GraduationCap, Filter, ChevronDown, Check, X } from 'lucide-react';
 import { BatchItem } from '../types/pimaxer';
-import { buildImageUrl } from '../services/pimaxerApi';
+import { buildImageUrl, fetchAllBatches } from '../services/pimaxerApi';
 
 interface BatchCatalogProps {
   batches: BatchItem[];
@@ -25,9 +25,12 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
   onEnrollBatch,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<BatchItem[] | null>(null);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [selectedClass, setSelectedClass] = useState<string>('all');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
+  const searchAbortRef = useRef<AbortController | null>(null);
 
   // Close the class filter dropdown on outside click / Escape
   useEffect(() => {
@@ -48,6 +51,49 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
     };
   }, [isFilterOpen]);
 
+  // Debounced full-catalogue search — fires API call when user types
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (!query) {
+      setSearchResults(null);
+      setIsSearchLoading(false);
+      return;
+    }
+
+    setIsSearchLoading(true);
+    const timeout = setTimeout(async () => {
+      // Cancel any in-flight search
+      searchAbortRef.current?.abort();
+      const controller = new AbortController();
+      searchAbortRef.current = controller;
+
+      try {
+        const allBatches = await fetchAllBatches();
+        if (controller.signal.aborted) return;
+        const q = query.toLowerCase();
+        const matched = allBatches.filter(
+          (b) =>
+            b.name.toLowerCase().includes(q) ||
+            b.slug.toLowerCase().includes(q) ||
+            (b.language && b.language.toLowerCase().includes(q))
+        );
+        setSearchResults(matched);
+      } catch (err) {
+        console.error('Search fetch failed:', err);
+        setSearchResults([]);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsSearchLoading(false);
+        }
+      }
+    }, 350);
+
+    return () => {
+      clearTimeout(timeout);
+      searchAbortRef.current?.abort();
+    };
+  }, [searchQuery]);
+
   const classes = useMemo(() => {
     const set = new Set<string>();
     batches.forEach((b) => {
@@ -56,7 +102,15 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
     return Array.from(set);
   }, [batches]);
 
+  // When searching, use API results; otherwise use current page batches
+  const displayBatches = searchResults !== null ? searchResults : batches;
+
   const filteredBatches = useMemo(() => {
+    if (searchResults !== null) {
+      // Already filtered server-side, just apply class filter
+      if (selectedClass === 'all') return searchResults;
+      return searchResults.filter((b) => b.class === selectedClass);
+    }
     return batches.filter((b) => {
       const matchesSearch =
         b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -65,7 +119,7 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
       const matchesClass = selectedClass === 'all' || b.class === selectedClass;
       return matchesSearch && matchesClass;
     });
-  }, [batches, searchQuery, selectedClass]);
+  }, [batches, searchQuery, selectedClass, searchResults]);
 
   // Single filter button options: All Classes + every class present in the catalogue
   const filterOptions = useMemo(
@@ -159,7 +213,7 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
       </div>
 
       {/* Batches Grid */}
-      {isLoading ? (
+      {isLoading || isSearchLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, idx) => (
             <div
@@ -178,9 +232,13 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
       ) : filteredBatches.length === 0 ? (
         <div className="text-center py-20 rounded-2xl bg-[var(--c-surface)] border border-[var(--c-border)] p-8">
           <BookOpen className="w-12 h-12 text-[var(--c-muted)] mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-[var(--c-body)]">No batches matched your filter</h3>
+          <h3 className="text-lg font-semibold text-[var(--c-body)]">
+            {searchResults !== null ? 'No batches found' : 'No batches matched your filter'}
+          </h3>
           <p className="text-sm text-[var(--c-muted)] mt-1 max-w-sm mx-auto">
-            Try adjusting your search keywords or switch to &quot;All Classes&quot; to discover more catalogue offerings.
+            {searchResults !== null
+              ? `No batches match "${searchQuery.trim()}" in the full catalogue. Try different keywords.`
+              : 'Try adjusting your search keywords or switch to "All Classes" to discover more catalogue offerings.'}
           </p>
           <button
             onClick={() => {
@@ -297,28 +355,30 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
         </div>
       )}
 
-      {/* Pagination Controls */}
-      <div className="flex flex-wrap items-center justify-center sm:justify-between gap-3 pt-6 border-t border-[var(--c-border)] text-xs text-[var(--c-muted)]">
-        <div>
-          Showing page <span className="text-[var(--c-heading)] font-mono tabular-nums">{currentPage}</span> of catalogue
+      {/* Pagination Controls — hidden during active search */}
+      {searchResults === null && (
+        <div className="flex flex-wrap items-center justify-center sm:justify-between gap-3 pt-6 border-t border-[var(--c-border)] text-xs text-[var(--c-muted)]">
+          <div>
+            Showing page <span className="text-[var(--c-heading)] font-mono tabular-nums">{currentPage}</span> of catalogue
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
+              disabled={currentPage <= 1 || isLoading}
+              className="px-4 py-2 rounded-lg border border-[var(--c-border)] bg-[var(--c-surface)] hover:border-[var(--c-accent)] text-[var(--c-body)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={batches.length < 50 || isLoading}
+              className="px-4 py-2 rounded-lg border border-[var(--c-border)] bg-[var(--c-surface)] hover:border-[var(--c-accent)] text-[var(--c-body)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              Next
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
-            disabled={currentPage <= 1 || isLoading}
-            className="px-4 py-2 rounded-lg border border-[var(--c-border)] bg-[var(--c-surface)] hover:border-[var(--c-accent)] text-[var(--c-body)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
-          >
-            Previous
-          </button>
-          <button
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={batches.length < 50 || isLoading}
-            className="px-4 py-2 rounded-lg border border-[var(--c-border)] bg-[var(--c-surface)] hover:border-[var(--c-accent)] text-[var(--c-body)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
-          >
-            Next
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

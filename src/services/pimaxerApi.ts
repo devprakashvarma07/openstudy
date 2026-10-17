@@ -75,6 +75,33 @@ export async function fetchBatches(page = 1, limit = 50): Promise<BatchesRespons
   }
 }
 
+/**
+ * Fetch ALL batches across every page — used for server-side catalogue search.
+ * The gateway has no search query param, so we iterate the full catalogue.
+ */
+export async function fetchAllBatches(): Promise<BatchItem[]> {
+  const all: BatchItem[] = [];
+  const limit = 50;
+  let page = 1;
+  let total = Infinity;
+
+  while (all.length < total && page <= 20) {
+    try {
+      const res = await fetchFromPiMaxer<BatchesResponse>(`/v1/batches?page=${page}&limit=${limit}`);
+      total = res.total || 0;
+      const items = res.data || [];
+      if (items.length === 0) break;
+      all.push(...items);
+      page++;
+    } catch (err) {
+      console.warn('fetchAllBatches: stopped at page', page, err);
+      break;
+    }
+  }
+
+  return all;
+}
+
 export async function fetchBatchSubjects(batchId: string): Promise<BatchSubject[]> {
   try {
     const res = await fetchFromPiMaxer<{ success: boolean; data: BatchSubject[] }>(
