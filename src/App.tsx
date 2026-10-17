@@ -22,7 +22,7 @@ import {
 } from './services/pimaxerApi';
 
 export default function App() {
-  const [activeView, setActiveView] = useState<'batches' | 'batch-detail' | 'enrolled' | 'cinema' | 'notes' | 'schedule'>('notes');
+  const [activeView, setActiveView] = useState<'batches' | 'batch-detail' | 'enrolled' | 'notes' | 'schedule'>('notes');
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [isHealthModalOpen, setIsHealthModalOpen] = useState(false);
 
@@ -42,6 +42,9 @@ export default function App() {
   // Study view tab (Study = notes, Bookmarked = bookmarks) controlled at app level
   // so bottom/side navigation can open the right tab directly.
   const [notesTab, setNotesTab] = useState<'notes' | 'bookmarks'>('notes');
+
+  // Whether the lecture player is open inside the Study tab
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
   // Theme: system mode by default, user toggle persisted (dark/light)
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -81,6 +84,7 @@ export default function App() {
 
   const handleOpenNotesTab = (tab: 'notes' | 'bookmarks') => {
     setNotesTab(tab);
+    setIsPlayerOpen(false);
     setActiveView('notes');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -212,7 +216,8 @@ export default function App() {
       setCurrentPlaylist([lecture]);
     }
 
-    setActiveView('cinema');
+    setActiveView('notes');
+    setIsPlayerOpen(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -271,7 +276,8 @@ export default function App() {
     setCurrentLecture(lectureItem);
     setCurrentSubjectName(bm.subjectName);
     setCurrentPlaylist([lectureItem]);
-    setActiveView('cinema');
+    setActiveView('notes');
+    setIsPlayerOpen(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -297,7 +303,6 @@ export default function App() {
           }}
           hasActiveBatch={!!activeBatch}
           hasEnrolled={enrolledBatches.length > 0}
-          hasActiveVideo={!!currentLecture}
           notesTab={notesTab}
           onOpenNotesTab={handleOpenNotesTab}
           theme={theme}
@@ -343,7 +348,7 @@ export default function App() {
             />
           )}
 
-          {activeView === 'cinema' && currentLecture && (
+          {activeView === 'notes' && isPlayerOpen && currentLecture && (
             <CinemaPlayer
               currentLecture={currentLecture}
               subjectName={currentSubjectName}
@@ -361,7 +366,7 @@ export default function App() {
             />
           )}
 
-          {activeView === 'notes' && (
+          {activeView === 'notes' && (!isPlayerOpen || !currentLecture) && (
             <StudyNotesView
               activeTab={notesTab}
               onPlayBookmark={handlePlayBookmark}

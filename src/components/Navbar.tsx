@@ -6,18 +6,16 @@ import {
   Moon,
   Library,
   GraduationCap,
-  Film,
   BookOpen,
   Bookmark,
   CalendarClock,
 } from 'lucide-react';
 
 interface NavbarProps {
-  activeView: 'batches' | 'batch-detail' | 'enrolled' | 'cinema' | 'notes' | 'schedule';
-  onNavigate: (view: 'batches' | 'batch-detail' | 'enrolled' | 'cinema' | 'notes' | 'schedule') => void;
+  activeView: 'batches' | 'batch-detail' | 'enrolled' | 'notes' | 'schedule';
+  onNavigate: (view: 'batches' | 'batch-detail' | 'enrolled' | 'notes' | 'schedule') => void;
   hasActiveBatch: boolean;
   hasEnrolled: boolean;
-  hasActiveVideo: boolean;
   notesTab: 'notes' | 'bookmarks';
   onOpenNotesTab: (tab: 'notes' | 'bookmarks') => void;
   theme: 'light' | 'dark';
@@ -29,7 +27,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNavigate,
   hasActiveBatch,
   hasEnrolled,
-  hasActiveVideo,
   notesTab,
   onOpenNotesTab,
   theme,
@@ -39,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const panelTouchX = useRef(0);
 
-  const navigate = (view: 'batches' | 'batch-detail' | 'enrolled' | 'cinema' | 'notes' | 'schedule') => {
+  const navigate = (view: 'batches' | 'batch-detail' | 'enrolled' | 'notes' | 'schedule') => {
     setIsDrawerOpen(false);
     onNavigate(view);
   };
@@ -114,15 +111,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       disabled: false,
       onClick: goEnrolled,
     },
-    {
-      key: 'cinema',
-      label: 'Cinema Player',
-      icon: Film,
-      active: activeView === 'cinema',
-      dim: !hasActiveVideo,
-      disabled: !hasActiveVideo,
-      onClick: () => navigate('cinema'),
-    },
+
     {
       key: 'study',
       label: 'Study Notes',
@@ -190,19 +179,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       dim: false,
       onClick: () => openNotesTab('bookmarks'),
     },
-    // Contextual Cinema entry so an active video is always reachable on mobile
-    ...(hasActiveVideo
-      ? [
-          {
-            key: 'cinema',
-            label: 'Cinema',
-            icon: Film,
-            active: activeView === 'cinema',
-            dim: false,
-            onClick: () => navigate('cinema'),
-          },
-        ]
-      : []),
+
   ];
 
   return (
