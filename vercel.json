@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/pimaxer-proxy/:path*",
-      "destination": "https://a.pimaxer.in/:path*"
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
     }
   ]
 }

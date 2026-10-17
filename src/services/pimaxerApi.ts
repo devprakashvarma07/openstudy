@@ -8,7 +8,7 @@ import {
   HealthResponse,
 } from '../types/pimaxer';
 
-const PRIMARY_API_BASE = 'https://a.pimaxer.in';
+const PRIMARY_API_BASE = '/api';
 const PROXY_API_BASE = '/pimaxer-proxy';
 
 async function fetchFromPiMaxer<T>(endpoint: string): Promise<T> {
@@ -209,7 +209,9 @@ export function buildImageUrl(preview?: { baseUrl?: string; key?: string }): str
 export function getStreamUrl(content: ContentLectureItem): string {
   if (content.url) return content.url;
   if (content.videoDetails?.videoUrl) return content.videoDetails.videoUrl;
-  return `https://a.pimaxer.in/stream/${content._id}/video.mp4`;
+  // Use videoDetails.video_id if available, otherwise fall back to content _id
+  const videoId = content.videoDetails?.video_id || content.videoDetails?.id || content._id;
+  return `/api/stream/${videoId}/video.mp4`;
 }
 
 // Fallback seed data in the event network offline
