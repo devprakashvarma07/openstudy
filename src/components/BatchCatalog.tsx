@@ -257,8 +257,16 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
             const totalLectures = batch.total_lectures || batch.completed_lectures_count || (batch.subjects?.length ? batch.subjects.length * 10 : 0);
             const completedCount = batch.completed_lectures_count || 0;
             const progressPercent = totalLectures > 0 ? Math.round((completedCount / totalLectures) * 100) : 100;
-            // Clean HTML from byName/description
-            const cleanText = (batch.byName || batch.description || batch.name || 'Batch').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 50);
+            // Clean HTML/CSS/JS from byName/description
+            const rawText = batch.byName || batch.description || batch.name || 'Batch';
+            const cleanText = rawText
+              .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ' ')
+              .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ' ')
+              .replace(/<[^>]*>/g, ' ')
+              .replace(/[{}*#:;]/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim()
+              .slice(0, 50) || 'Batch';
 
             return (
               <div
