@@ -243,6 +243,24 @@ export const CinemaPlayer: React.FC<CinemaPlayerProps> = ({
     };
   }, []);
 
+  // Center play button: appears the moment the video pauses, then auto-fades
+  // after 1s so the paused lecture frame stays fully visible.
+  const [showCenterPlay, setShowCenterPlay] = useState(false);
+  const centerPlayTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (isPlaying) {
+      setShowCenterPlay(false);
+    } else {
+      setShowCenterPlay(true);
+      if (centerPlayTimeoutRef.current) window.clearTimeout(centerPlayTimeoutRef.current);
+      centerPlayTimeoutRef.current = window.setTimeout(() => setShowCenterPlay(false), 1000);
+    }
+    return () => {
+      if (centerPlayTimeoutRef.current) window.clearTimeout(centerPlayTimeoutRef.current);
+    };
+  }, [isPlaying]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -384,17 +402,18 @@ export const CinemaPlayer: React.FC<CinemaPlayerProps> = ({
               className="w-full h-full object-contain cursor-pointer"
             />
 
-            {/* Center Play Button Overlay on Pause */}
-            {!isPlaying && (
-              <div
-                onClick={togglePlay}
-                className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-xs cursor-pointer z-10 transition-opacity"
-              >
-                <div className="w-16 h-16 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 flex items-center justify-center shadow-lg transition-transform hover:scale-110">
-                  <Play className="w-7 h-7 fill-slate-950 ml-1" />
-                </div>
+            {/* Center Play Button - shown on pause, auto-fades after 1s.
+                No blur/dim: the paused lecture frame must stay fully visible. */}
+            <div
+              onClick={togglePlay}
+              className={`absolute inset-0 flex items-center justify-center cursor-pointer z-10 transition-opacity duration-500 ${
+                showCenterPlay ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <div className="w-16 h-16 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 flex items-center justify-center shadow-lg transition-transform hover:scale-110">
+                <Play className="w-7 h-7 fill-slate-950 ml-1" />
               </div>
-            )}
+            </div>
 
             {/* Custom Cinema Player Control Bar */}
             <div
