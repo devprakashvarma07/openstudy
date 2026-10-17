@@ -164,7 +164,7 @@ export const BatchDetail: React.FC<BatchDetailProps> = ({
   }, [scheduleItems]);
 
   const filteredContents = contents.filter((c) =>
-    c.topic.toLowerCase().includes(contentSearch.toLowerCase())
+    (c.topic || '').toLowerCase().includes(contentSearch.toLowerCase())
   );
 
   // The gateway returns a single catch-all All Lectures chapter per subject,
@@ -175,12 +175,12 @@ export const BatchDetail: React.FC<BatchDetailProps> = ({
   const lecturesForTopic = (name: string, slug?: string): ContentLectureItem[] =>
     isCatchAllTopic(name, slug)
       ? contents
-      : contents.filter((c) => c.topic?.toLowerCase().includes(name.toLowerCase()));
+      : contents.filter((c) => (c.topic || '').toLowerCase().includes((name || '').toLowerCase()));
 
   // Lectures for the chosen chapter in the mobile drill-down flow
   const mobileLectures = (
     mobileTopic ? lecturesForTopic(mobileTopic.name, mobileTopic.slug) : []
-  ).filter((c) => c.topic.toLowerCase().includes(contentSearch.toLowerCase()));
+  ).filter((c) => (c.topic || '').toLowerCase().includes(contentSearch.toLowerCase()));
 
   return (
     <ErrorBoundary>
