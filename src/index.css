@@ -79,3 +79,20 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--c-muted);
 }
+
+/* -------------------------------------------------------------- */
+/* Cinema player: true fullscreen = fill the whole screen.         */
+/* The video box itself goes fullscreen (not its wrapper), so the  */
+/* control bar (play / mute / speed / exit) stays anchored to the  */
+/* screen edge and nothing is clipped on landscape phones or       */
+/* 16:10 laptops.                                                  */
+.os-video-box:fullscreen,
+.os-video-box:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  max-width: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}

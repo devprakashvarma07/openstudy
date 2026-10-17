@@ -353,11 +353,11 @@ export const CinemaPlayer: React.FC<CinemaPlayerProps> = ({
       >
         {/* Cinema Video Player Viewport */}
         <div
-          ref={containerRef}
           className={`space-y-4 ${isTheaterMode ? 'lg:col-span-12' : 'lg:col-span-8'}`}
         >
           <div
-            className="relative aspect-video rounded-2xl bg-black border border-[#1e293b] overflow-hidden group shadow-2xl"
+            ref={containerRef}
+            className="os-video-box relative aspect-video rounded-2xl bg-black border border-[#1e293b] overflow-hidden group shadow-2xl"
             onMouseEnter={() => setShowControls(true)}
             onMouseMove={() => {
               setShowControls(true);
