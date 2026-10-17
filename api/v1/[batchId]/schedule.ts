@@ -7,7 +7,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   const { batchId } = req.query;
   try {
-    const pwRes = await fetch(`${PW_API_BASE}/v2/batches/${batchId}/schedule`, {
+    const pwRes = await fetch(`${PW_API_BASE}/v3/batches/${batchId}/details`, {
       headers: { Authorization: `Bearer ${PW_TOKEN}`, Accept: 'application/json', 'organizationid': '5eb393ee95fab7468a79d189' },
     });
     const data = await pwRes.json();
