@@ -179,8 +179,8 @@ export async function fetchSubjectContents(
   subjectId: string
 ): Promise<ContentLectureItem[]> {
   try {
-    const res = await fetchFromPiMaxer<{ success: boolean; data: ContentLectureItem[] }>(
-      `/v1/${batchId}/subject/${subjectId}/contents`
+    const res = await fetchFromPiMaxer<{ success: boolean; data: ContentLectureItem[]; paginate?: { totalCount?: number } }>(
+      `/v1/contents?batchId=${batchId}&subjectId=${subjectId}&page=1&contentType=videos`
     );
     return res.data || [];
   } catch (err) {
