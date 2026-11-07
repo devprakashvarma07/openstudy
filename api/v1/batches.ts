@@ -1,5 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { loadSnapshot } from '../_snapshots';
+import { readFileSync } from 'fs';
+import path from 'path';
+
+function loadSnapshot(name: string): any | null {
+  try {
+    return JSON.parse(readFileSync(path.join(process.cwd(), 'data', 'snapshots', `${name}.json`), 'utf-8'));
+  } catch {
+    return null;
+  }
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
