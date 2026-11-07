@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const DELTA_API_BASE = 'https://pw.deltaverse.site';
+const DELTA_API_BASE = 'https://a.pimaxer.in';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { uuid } = req.query;
