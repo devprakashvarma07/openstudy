@@ -1,0 +1,50 @@
+{
+  "success": true,
+  "data": {
+    "_id": "6ad0b5eeae9b50d71ca6392c",
+    "batchName": "SRIJAN (Prelims + Mains) 4.0 Batch 2027",
+    "batchPrice": 0,
+    "language": "Hindi",
+    "byName": "For UPSC Aspirants",
+    "subjects": [
+      {
+        "_id": "sub_001",
+        "subjectId": "science-563506",
+        "subjectName": "Science",
+        "teacherIds": ["teacher_001"]
+      },
+      {
+        "_id": "sub_002",
+        "subjectId": "history-563507",
+        "subjectName": "History",
+        "teacherIds": ["teacher_002"]
+      },
+      {
+        "_id": "sub_003",
+        "subjectId": "geography-563508",
+        "subjectName": "Geography",
+        "teacherIds": ["teacher_003"]
+      }
+    ],
+    "teachers": [
+      {
+        "_id": "teacher_001",
+        "name": "Rahul Sharma",
+        "subject": "Science",
+        "image": ""
+      },
+      {
+        "_id": "teacher_002",
+        "name": "Priya Singh",
+        "subject": "History",
+        "image": ""
+      },
+      {
+        "_id": "teacher_003",
+        "name": "Amit Kumar",
+        "subject": "Geography",
+        "image": ""
+      }
+    ]
+  }
+}

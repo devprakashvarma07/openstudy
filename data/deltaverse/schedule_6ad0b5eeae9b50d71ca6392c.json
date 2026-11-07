@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "sch_001",
+      "subject": "Science",
+      "subjectId": "science-563506",
+      "lecturesCount": 120
+    },
+    {
+      "_id": "sch_002",
+      "subject": "History",
+      "subjectId": "history-563507",
+      "lecturesCount": 80
+    },
+    {
+      "_id": "sch_003",
+      "subject": "Geography",
+      "subjectId": "geography-563508",
+      "lecturesCount": 60
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "698ccb7649d3706b8b44843f",
+      "topic": "Cell: The Unit of Life",
+      "url": "",
+      "duration": "45:00",
+      "date": "2026-10-18",
+      "time": "10:00 AM",
+      "isFree": true,
+      "isLocked": false
+    },
+    {
+      "topic": "Biomolecules",
+      "url": "",
+      "duration": "50:00",
+      "date": "2026-10-19",
+      "time": "10:00 AM",
+      "isFree": true,
+      "isLocked": false
+    },
+    {
+      "topic": "Photosynthesis",
+      "url": "",
+      "duration": "40:00",
+      "date": "2026-10-20",
+      "time": "10:00 AM",
+      "isFree": false,
+      "isLocked": false
+    }
+  ]
+}

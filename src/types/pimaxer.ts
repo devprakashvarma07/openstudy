@@ -98,6 +98,7 @@ export interface ContentLectureItem {
     id: string;
     name: string;
     videoUrl: string;
+    video_id?: string;
   };
 }
 

@@ -74,7 +74,7 @@ export const BatchCatalog: React.FC<BatchCatalogProps> = ({
         const matched = allBatches.filter(
           (b) =>
             b.name.toLowerCase().includes(q) ||
-            b.slug.toLowerCase().includes(q) ||
+            b.slug?.toLowerCase().includes(q) ||
             (b.language && b.language.toLowerCase().includes(q))
         );
         setSearchResults(matched);
